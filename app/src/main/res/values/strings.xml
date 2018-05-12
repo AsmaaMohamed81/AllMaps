@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AllMaps</string>
+    <string name="google_maps_API_Key">AIzaSyCK4gdLGiMgKDVj3rhDtkbi-Y3kSIYjL-g</string>
 </resources>
