@@ -22,7 +22,9 @@ public class MainActivity extends AppCompatActivity implements Event{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding= DataBindingUtil.setContentView(this,R.layout.activity_main);
+
         binding.setEvent(this);
 
     }

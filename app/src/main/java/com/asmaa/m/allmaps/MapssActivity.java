@@ -2,6 +2,8 @@ package com.asmaa.m.allmaps;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -9,6 +11,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,17 +28,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MapssActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapssActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private boolean isGranted = false;
     private final int PER_REQ = 12012;
     private static final float Defult_Zoom=15f;
 
+    //widgets
+    private EditText Search;
+    //vars
     GoogleMap Mmap;
-
+    private boolean isGranted = false;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
 
@@ -41,10 +53,57 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapss);
+        Search = findViewById(R.id.edt_search);
 
         checkPermission();
     }
 
+    private void init(){
+
+        Log.d(TAG, "init: intialization");
+
+        Search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionid, KeyEvent keyEvent) {
+
+                if (actionid== EditorInfo.IME_ACTION_SEARCH
+                        || actionid==EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction()==KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction()==KeyEvent.KEYCODE_ENTER){
+
+                    geolocate();
+                }
+                return false;
+            }
+
+
+        });
+    }
+
+    private void geolocate() {
+
+        String searchString=Search.getText().toString();
+        Geocoder geocoder= new Geocoder(this);
+        List<Address> addressList=new ArrayList<>();
+
+        try {
+
+            addressList=geocoder.getFromLocationName(searchString,1);
+
+        }catch (IOException e){
+
+            Log.d(TAG, "geolocate:IOException "+e.getMessage());
+
+        }
+
+        if (addressList.size() > 0){
+             Address address=addressList.get(0);
+            Log.d(TAG, "geolocate: found location"+address.toString());
+        }
+
+
+
+    }
 
 
     @Override
@@ -57,8 +116,12 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
         if (isGranted){
             try {
                 getDeviceLocation();
+
+                // get image of gps
                 Mmap.setMyLocationEnabled(true);
+                // delete image of gps
                 Mmap.getUiSettings().setMyLocationButtonEnabled(false);
+                init();
             }catch (SecurityException e)
             {
                 e.printStackTrace();
@@ -71,8 +134,8 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
 
 
     }
-
-    private void getDeviceLocation() {
+//
+    private void getDeviceLocation()    {
 
         Log.d(TAG, "getDeviceLocation: get Currnt Location");
 
@@ -128,9 +191,13 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
         Log.d(TAG,"initMap : Init Map ");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        //make implement to get method of onMapReady():
+
         mapFragment.getMapAsync(this);
     }
 
+// 1 step checkPermission && onRequestPermissionsResult
     private void checkPermission() {
         Log.d(TAG, "checkPermission: get premation");
         String[] permission = new String[]{FINE_LOCATION, COURSE_LOCATION};
