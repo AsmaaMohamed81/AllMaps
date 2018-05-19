@@ -5,26 +5,29 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -41,7 +44,8 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
     private static final float Defult_Zoom=15f;
 
     //widgets
-    private EditText Search;
+    private AutoCompleteTextView Search;
+    private ImageView gps;
     //vars
     GoogleMap Mmap;
     private boolean isGranted = false;
@@ -54,6 +58,7 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapss);
         Search = findViewById(R.id.edt_search);
+        gps=findViewById(R.id.img_gps);
 
         checkPermission();
     }
@@ -78,6 +83,16 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
 
 
         });
+
+        gps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDeviceLocation();
+            }
+        });
+
+        hideSoftKeyboard();
+
     }
 
     private void geolocate() {
@@ -99,6 +114,7 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
         if (addressList.size() > 0){
              Address address=addressList.get(0);
             Log.d(TAG, "geolocate: found location"+address.toString());
+            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()),Defult_Zoom,address.getAddressLine(0));
         }
 
 
@@ -106,6 +122,24 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
 
+
+    private void moveCamera(LatLng latLng,float zoom,String title   ){
+        Mmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
+
+
+        if (!title.equals("myLocation")){
+            MarkerOptions options=new MarkerOptions()
+                    .position(latLng)
+                    .title(title);
+
+            Mmap.addMarker(options);
+
+        }
+
+        hideSoftKeyboard();
+
+
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Mmap=googleMap;
@@ -159,8 +193,8 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
                                 Log.d(TAG, "onComplete: "+currentlocation1.getLongitude());
 
 
-                                Mmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng
-                                        (currentlocation1.getLatitude(),currentlocation1.getLongitude()),Defult_Zoom));
+                                moveCamera(new LatLng
+                                        (currentlocation1.getLatitude(),currentlocation1.getLongitude()),Defult_Zoom,"myLocation");
 
                             }
 
@@ -253,5 +287,7 @@ public class MapssActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
 
-
+private void hideSoftKeyboard(){
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+}
 }
