@@ -3,15 +3,14 @@ package com.asmaa.m.allmaps;
 import android.app.Dialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.ConditionVariable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.asmaa.m.allmaps.databinding.ActivityMainBinding;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.asmaa.m.allmaps.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements Event{
 
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements Event{
 
 
 
-    public boolean isServiceOk(){
+     public boolean isServiceOk(){
         int available= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
 
         if (available== ConnectionResult.SUCCESS){
