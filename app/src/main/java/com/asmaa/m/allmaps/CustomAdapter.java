@@ -34,7 +34,6 @@ public class CustomAdapter implements GoogleMap.InfoWindowAdapter {
         if(!snipte.equals("")){
             TEXsnipte.setText(snipte);
         }
-
     }
     @Override
     public View getInfoWindow(Marker marker) {

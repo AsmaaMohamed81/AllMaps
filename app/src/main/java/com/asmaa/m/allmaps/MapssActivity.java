@@ -257,6 +257,8 @@ public class MapssActivity
 
             try {
 
+                Toast.makeText(this, "moveCamera Place Info", Toast.LENGTH_SHORT).show();
+
                 String snippte="Adress : "+placeInfo.getAddress()+"\n"+
                         "phone : "+placeInfo.getPhonenum()+"\n"+
                         "web : "+placeInfo.getWebsite()+"\n"+
@@ -493,14 +495,12 @@ private void hideSoftKeyboard(){
                 mpalce.setPhonenum(place.getPhoneNumber().toString());
                 Log.d(TAG, "onResult: getPhoneNumber"+place.getPhoneNumber().toString());
 
-                Log.d(TAG, "onResult: place"+mpalce.toString());
+                Log.d(TAG, "onResult: get all place Info"+mpalce.toString());
 
 
             }catch (NullPointerException e){
                 Log.d(TAG, "onResult: NullPointerException "+e.getMessage());
             }
-
-
 
 
             moveCamera(new LatLng(place.getViewport().getCenter().latitude,
